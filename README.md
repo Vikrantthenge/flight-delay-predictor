@@ -1,5 +1,10 @@
 # ✈️ FlightPulse — Flight Delay Prediction Dashboard
 
+<p align="center">
+  <img src="https://your-image-hosting-link.com/flightpulse-thumbnail.png" alt="FlightPulse Thumbnail" width="400"/>
+</p>
+
+
 **FlightPulse** is a machine learning-powered dashboard that predicts flight delays based on airline, route, and weather conditions. Built with Streamlit and trained on real aviation data, it blends predictive analytics with interactive visualizations to deliver actionable insights for travelers, airlines, and airport operations.
 
 ---
