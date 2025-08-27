@@ -1,7 +1,7 @@
 # ✈️ FlightPulse — Flight Delay Prediction Dashboard
 
 <p align="center">
-  <img src="https://your-image-hosting-link.com/flightpulse-thumbnail.png" alt="FlightPulse Thumbnail" width="400"/>
+  <img src="[https://your-image-hosting-link.com/flightpulse-thumbnail.png"](https://github.com/Vikrantthenge/flight-delay-predictor/blob/main/thumbnail.png) alt="FlightPulse Thumbnail" width="400"/>
 </p>
 
 
