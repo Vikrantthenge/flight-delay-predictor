@@ -10,8 +10,7 @@ st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
 st.markdown(
     """
     <div style='background-color:#8B0000; padding:6px; text-align:center; border-radius:5px;'>
-        <span style='color:white; font-size:16px;'>✈️ FlightPulse — Delay Forecasting Dashboard</span>
-    </div>
+        <span style='color:white; font-size:16px;'>✈️ Flight Pulse 
     """,
     unsafe_allow_html=True
 )
@@ -19,7 +18,7 @@ st.markdown(
 st.markdown(
     """
     <div style='text-align: center; padding: 10px 0;'>
-        <h1 style='color: darkred;'>✈️ FlightPulse</h1>
+        <h1 style='color: darkred;'>✈️ Flight Pulse</h1>
         <h3 style='color: gray;'>Delay Forecasting Dashboard</h3>
     </div>
     """,
@@ -30,6 +29,21 @@ st.markdown(
 
 
 st.markdown("Predict flight delays based on route, airline, and weather conditions.")
+#st.image("thumbnail.png", use_column_width=True)
+# <p align="center">
+# <img src="thumbnail1.png" alt="Flight Pulse Thumbnail" width="400"/>
+# </p>
+
+st.markdown(
+    """
+    <div style='background-color:#8B0000; padding:6px; text-align:center; border-radius:5px;'>
+        <span style='color:white; font-size:16px;'> Delay Forecasting Dashboard</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
 
 st.markdown("## 🧭 Overview")
 
