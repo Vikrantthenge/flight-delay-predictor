@@ -1,7 +1,7 @@
 # ✈️ Flight Pulse — Flight Delay Prediction Dashboard
 
 <p align="center">
-  <img src="https://github.com/Vikrantthenge/flight-delay-predictor/blob/main/thumbnail.png"](https://github.com/Vikrantthenge/flight-delay-predictor/blob/main/thumbnail.png) alt="FlightPulse Thumbnail" width="400"/>
+  <img src="https://github.com/Vikrantthenge/flight-delay-predictor/blob/main/thumbnail.png"](https://github.com/Vikrantthenge/flight-delay-predictor/blob/main/thumbnail.png) alt="FlightPulse Thumbnail" width="200"/>
 </p>
 
 
