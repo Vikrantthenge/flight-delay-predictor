@@ -62,8 +62,7 @@ st.markdown(
     - Responsive design for desktop and mobile viewing
 
     ### 🧠 Tech Stack
-    Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
-
+Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
     ### 🎯 Purpose
     To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that is instantly accessible.
     """,
@@ -80,25 +79,7 @@ from PIL import Image
 import streamlit as st
 
 # --- Generate QR Code ---
-qr_url = "st.markdown("## 🧠 Tech Stack")
-
-st.markdown(
-    """
-    <div style='font-size:16px; line-height:1.6'>
-        <ul>
-            <li><strong>Frontend UI:</strong> Streamlit, HTML/CSS Markdown styling</li>
-            <li><strong>Visualization:</strong> Plotly Express (bar chart, spline curve)</li>
-            <li><strong>Model Loading:</strong> Joblib (.pkl file)</li>
-            <li><strong>Data Handling:</strong> Pandas</li>
-            <li><strong>ML Model:</strong> Random Forest (trained externally)</li>
-            <li><strong>QR Integration:</strong> qrcode, PIL</li>
-            <li><strong>Deployment:</strong> Streamlit Cloud</li>
-            <li><strong>Branding:</strong> Custom banner, dark red theme, thumbnail, recruiter-polished footer</li>
-        </ul>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+qr_url = "https://flight-delay-predictor-pulse.streamlit.app/"
 qr = qrcode.make(qr_url)
 qr_img = qr.resize((120, 120))  # Resize for sidebar
 
