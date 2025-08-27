@@ -18,8 +18,8 @@ st.markdown(
 st.markdown(
     """
     <div style='text-align: center; padding: 10px 0;'>
-        <h1 style='color: darkred;'>✈️ Flight Pulse</h1>
-        <h3 style='color: gray;'>Delay Forecasting Dashboard</h3>
+        <h1 style='color: darkred;'>✈️ Flight  Pulse</h1>
+        <h3 style='color: gray;'>Delay  Forecasting  Dashboard</h3>
     </div>
     """,
     unsafe_allow_html=True
@@ -37,7 +37,7 @@ st.markdown("Predict flight delays based on route, airline, and weather conditio
 st.markdown(
     """
     <div style='background-color:#8B0000; padding:6px; text-align:center; border-radius:5px;'>
-        <span style='color:white; font-size:16px;'> Delay Forecasting Dashboard</span>
+        <span style='color:white; font-size:16px;'> Delay   Forecasting   Dashboard</span>
     </div>
     """,
     unsafe_allow_html=True
@@ -62,10 +62,10 @@ st.markdown(
     - Responsive design for desktop and mobile viewing
 
     ### 🧠 Tech Stack
-    Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML
+    Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
 
     ### 🎯 Purpose
-    To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that’s recruiter-ready and instantly accessible.
+    To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that is instantly accessible.
     """,
     unsafe_allow_html=True
 )
@@ -74,6 +74,37 @@ st.markdown(
 model = joblib.load("model/flight_delay_model.pkl")
 
 # --- Sidebar Inputs ---
+
+import qrcode
+from PIL import Image
+import streamlit as st
+
+# --- Generate QR Code ---
+qr_url = "st.markdown("## 🧠 Tech Stack")
+
+st.markdown(
+    """
+    <div style='font-size:16px; line-height:1.6'>
+        <ul>
+            <li><strong>Frontend UI:</strong> Streamlit, HTML/CSS Markdown styling</li>
+            <li><strong>Visualization:</strong> Plotly Express (bar chart, spline curve)</li>
+            <li><strong>Model Loading:</strong> Joblib (.pkl file)</li>
+            <li><strong>Data Handling:</strong> Pandas</li>
+            <li><strong>ML Model:</strong> Random Forest (trained externally)</li>
+            <li><strong>QR Integration:</strong> qrcode, PIL</li>
+            <li><strong>Deployment:</strong> Streamlit Cloud</li>
+            <li><strong>Branding:</strong> Custom banner, dark red theme, thumbnail, recruiter-polished footer</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+qr = qrcode.make(qr_url)
+qr_img = qr.resize((120, 120))  # Resize for sidebar
+
+# --- Display QR Code in Sidebar ---
+with st.sidebar:
+    st.image(qr_img, caption="Scan to Launch App", use_column_width=False)
 st.sidebar.header("Flight Details")
 dep_hour = st.sidebar.slider("Departure Hour", 0, 23, 9)
 arr_hour = st.sidebar.slider("Arrival Hour", 0, 23, 11)
@@ -155,7 +186,7 @@ st.plotly_chart(fig_line, use_container_width=True)
 
 # --- Footer ---
 st.markdown("---")
-st.markdown("Made with ❤️ by Vikrant Thenge |")
+st.markdown("Made with ❤️ by **Vikrant Thenge** |")
 st.markdown("---")
 
 st.markdown("---")
