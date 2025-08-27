@@ -31,7 +31,7 @@
 
 ## 🚀 Live Demo
 
-🔗 [Launch FlightPulse](https://share.streamlit.io/vikrantthenge/flight-delay-predictor/main/app.py)  
+[![View in Streamlit](https://img.shields.io/badge/Launch%20App-FlightPulse-darkred?logo=streamlit)](https://share.streamlit.io/vikrantthenge/flight-delay-predictor/main/app.py)
 📱 Scan QR code on resume or LinkedIn banner for instant access
 
 ---
