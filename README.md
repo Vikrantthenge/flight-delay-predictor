@@ -36,4 +36,20 @@
 
 ---
 
-## 📁 Repository Structure
+### 🔍 What Makes FlightPulse Unique
+
+- ✈️ **Aviation + Weather Logic**  
+  Inputs include departure hour, visibility, humidity, cloud cover, airline, origin, and destination — engineered to reflect real-world flight delay factors.
+
+- 📊 **Branded Visual Experience**  
+  Custom banner, multi-shade dark red palette, and recruiter-polished layout designed for visual impact and professional appeal.
+
+- 🧠 **Model-Aware Input Engineering**  
+  Dynamically aligns user inputs with trained feature schema using `model.feature_names_in_`, ensuring robust prediction flow.
+
+- 📱 **Mobile-Ready Deployment**  
+  Hosted on Streamlit Cloud with responsive layout and QR-ready thumbnail for instant access from resume or LinkedIn.
+
+- 🔗 **Live App + GitHub Integration**  
+  Fully deployed with clean README, launch badge, and direct access to source code and model logic.
+
