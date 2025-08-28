@@ -44,25 +44,15 @@ st.markdown(
 )
 
 
-
 st.markdown("## 🧭 Overview")
 
-st.markdown(
-    """
-    **FlightPulse** is a machine learning-powered dashboard that predicts flight delays based on airline, route, and weather conditions.  
-    Built with Streamlit and trained on real aviation data, it blends predictive analytics with interactive visualizations to deliver actionable insights for travelers, airlines, and airport operations.
+st.markdown ("""
+    **Flight Pulse** is a machine learning-powered dashboard that predicts flight delays based on airline, route, and weather conditions.  
+    Built with Streamlit and trained on real aviation data, it blends predictive analytics with interactive visualizations to deliver actionable insights for travelers, airlines, and airport operations***).
 
-    ### 🔍 Key Features
-    - Real-time prediction of delay probability using a trained Random Forest model  
-    - Interactive input panel for flight details: departure hour, visibility, humidity, cloud cover, airline, origin, and destination  
-    - Visual insights via Plotly charts:
-        - 📊 Average Delay by Airline (multi-shade dark red palette)
-        - ⏱️ Delay Distribution by Departure Hour (spline curve with markers)
-    - Branded layout with custom banner, QR-ready thumbnail, and recruiter-polished footer  
-    - Responsive design for desktop and mobile viewing
+     ### 🧠 Tech Stack
+     Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow) 
 
-    ### 🧠 Tech Stack
-Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
     ### 🎯 Purpose
     To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that is instantly accessible.
     """,
@@ -74,28 +64,63 @@ model = joblib.load("model/flight_delay_model.pkl")
 
 # --- Sidebar Inputs ---
 
+import streamlit as st
 import qrcode
 from PIL import Image
-import streamlit as st
+
+# --- Page Config ---
+st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
 
 # --- Generate QR Code ---
 qr_url = "https://flight-delay-predictor-pulse.streamlit.app/"
 qr = qrcode.make(qr_url)
-qr_img = qr.resize((120, 120))  # Resize for sidebar
+qr_img = qr.resize((150, 150))  # Match thumbnail size
 
-# --- Display QR Code in Sidebar ---
+import streamlit as st
+import qrcode
+from PIL import Image
+
+# --- Page Config ---
+st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
+
+# --- Generate QR Code ---
+qr_url = "https://flight-delay-predictor-pulse.streamlit.app/"
+qr = qrcode.make(qr_url)
+qr_img = qr.resize((150, 150))  # Match thumbnail size
+
+# --- Sidebar Layout ---
 with st.sidebar:
-    st.image(qr_img, caption="Scan to Launch App", use_column_width=False)
-st.sidebar.header("Flight Details")
-dep_hour = st.sidebar.slider("Departure Hour", 0, 23, 9)
-arr_hour = st.sidebar.slider("Arrival Hour", 0, 23, 11)
-visibility = st.sidebar.slider("Visibility (km)", 1, 10, 5)
-humidity = st.sidebar.slider("Humidity (%)", 10, 100, 60)
-cloudcover = st.sidebar.slider("Cloud Cover (%)", 0, 100, 40)
+    st.markdown("✈️ **Flight Delay Predictor**✈️")
 
-airline = st.sidebar.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"])
-origin = st.sidebar.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
-destination = st.sidebar.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
+    # QR + Thumbnail side-by-side
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.image(qr_img, caption="Scan to Launch App", width=100
+        )
+    with col2:
+        st.image(
+            "https://raw.githubusercontent.com/Vikrantthenge/flight-delay-predictor/main/thumbnail1.png",
+            caption="FlightPulse Delay Forecasting",
+            width=100
+        )
+
+    st.markdown("")
+
+    # Flight Details Inputs
+    st.header("Flight Details")
+    dep_hour = st.slider("Departure Hour", 0, 23, 9, key="dep_hour")
+    arr_hour = st.slider("Arrival Hour", 0, 23, 11, key="arr_hour")
+    visibility = st.slider("Visibility (km)", 1, 10, 5, key="visibility")
+    humidity = st.slider("Humidity (%)", 10, 100, 60, key="humidity")
+    cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40, key="cloudcover")
+
+    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"], key="airline")
+    origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"], key="origin")
+    destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"], key="destination")
+
+    #st.markdown("---")
+    #st.button("Predict Delay", type="primary")
+
 
 # --- Prepare Input Data ---
 def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination):
