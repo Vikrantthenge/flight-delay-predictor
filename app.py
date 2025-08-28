@@ -90,21 +90,25 @@ qr_img = qr.resize((150, 150))  # Match thumbnail size
 
 # --- Sidebar Layout ---
 with st.sidebar:
-    st.markdown("✈️ **Flight Delay Predictor**✈️")
+    st.markdown("✈️ **Flight Delay Predictor** ✈️")
 
-    # QR + Thumbnail side-by-side
+    # QR + Clickable Thumbnail side-by-side
     col1, col2 = st.columns([1, 1])
     with col1:
-        st.image(qr_img, caption="Scan to Launch App", width=100
-        )
+        st.image(qr_img, caption="Scan to Launch App", width=100)
     with col2:
-        st.image(
-            "https://raw.githubusercontent.com/Vikrantthenge/flight-delay-predictor/main/thumbnail1.png",
-            caption="FlightPulse Delay Forecasting",
-            width=100
+        st.markdown(
+            f"""
+            <a href="https://flight-delay-predictor-pulse.streamlit.app/" target="_blank">
+                <img src="https://raw.githubusercontent.com/Vikrantthenge/flight-delay-predictor/main/thumbnail1.png" 
+                     alt="FlightPulse Delay Forecasting" width="100" style="border-radius:6px;">
+            </a>
+            """,
+            unsafe_allow_html=True
         )
+        st.caption("FlightPulse Delay Forecasting")
 
-    st.markdown("")
+    st.markdown("")  # Optional spacing or divider
 
     # Flight Details Inputs
     st.header("Flight Details")
@@ -120,6 +124,30 @@ with st.sidebar:
 
     #st.markdown("---")
     #st.button("Predict Delay", type="primary")
+
+    st.markdown("""
+    <style>
+    .custom-button {
+        background-color: #d62728;  /* Red tone */
+        color: white;
+        padding: 0.5em 1.5em;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .custom-button:hover {
+        background-color: #b22222;
+    }
+    </style>
+    <center>
+        <a href="#" onclick="document.dispatchEvent(new Event('predict_delay'))">
+            <button class="custom-button">Predict Delay</button>
+        </a>
+    </center>
+""", unsafe_allow_html=True)
 
 
 # --- Prepare Input Data ---
