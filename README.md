@@ -42,6 +42,18 @@
 
 ---
 
+## 🔄 CI/CD Integration
+
+This dashboard uses **GitHub Actions** for Continuous Integration and Deployment:
+
+- ✅ Linting via `flake8` to ensure clean, error-free code
+- ✅ Optional unit testing via `pytest`
+- ✅ Auto-deployment to Streamlit Cloud on every push to `main`
+- ✅ Live CI badge reflects build health and workflow status
+
+Every update is automatically validated and deployed, ensuring production-grade reliability and faster iteration.
+
+
 ### 🔍 What Makes FlightPulse Unique
 
 - ✈️ **Aviation + Weather Logic**  
