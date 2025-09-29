@@ -230,9 +230,6 @@ plt.close()
 # Display in Streamlit
 st.image(buf)
 
-# Force SHAP to draw into a new figure
-plt.figure(figsize=(10, 6))
-shap.summary_plot(shap_values, sample_input, plot_type="bar", show=False)
 
 # Capture and display the figure
 fig = plt.gcf()
