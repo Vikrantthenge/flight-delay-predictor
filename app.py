@@ -151,10 +151,20 @@ if st.sidebar.button("Predict Delay"):
     st.metric(label="Predicted Delay Probability", value=f"{prediction*100:.1f}%")
 
 # --- Charts ---
+custom_reds = ["#4A0000", "#800000", "#8B0000", "#B22222", "#DC143C", "#A52A2A"]
+
+airline_colors = {
+    "Indigo": custom_reds[0],      # Deep maroon – lowest delay
+    "Spicejet": custom_reds[4],    # Crimson – highest delay
+    "Air India": custom_reds[3],   # Firebrick – moderate delay
+    "Akasa Air": custom_reds[2],   # Dark red – moderate delay
+    "Air Asia": custom_reds[1],    # Maroon – high delay
+    "Vistara": custom_reds[5]      # Brownish red – low-moderate delay
+}
 st.subheader("📊 Average Delay by Airline")
 airline_delay_df = pd.DataFrame({
     "Airline": ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"],
-    "Avg Delay (min)": [12, 18, 22, 15, 17, 9]  # Added Air Asia with sample delay value
+    "Avg Delay (min)": [12, 18, 22, 15, 17, 9] 
 })
 fig_bar = px.bar(
     airline_delay_df,
