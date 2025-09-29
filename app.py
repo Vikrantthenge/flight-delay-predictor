@@ -219,7 +219,9 @@ Below is a summary plot showing the most influential features for the current in
 sample_inputs = pd.concat([
     create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
     create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
-    create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV")
+    create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV"),
+    create_input_df(18, 20, 9, 85, 10, "Go Air", "HYD", "DEL"),
+    create_input_df(22, 1, 2, 40, 90, "Vistara", "TRV", "MAA")
 ])
 
 # Generate SHAP values
