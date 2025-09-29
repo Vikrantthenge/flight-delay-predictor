@@ -189,9 +189,13 @@ This chart highlights which features most influence delay predictions — such a
 Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability.
 """)
 importance_df = pd.DataFrame({
+
     "Feature": model.feature_names_in_,
     "Importance": model.feature_importances_
-    fig_imp = px.bar(
+    })
+
+
+fig_imp = px.bar(
     importance_df.head(10),
     x="Feature",
     y="Importance",
@@ -265,4 +269,3 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
-
