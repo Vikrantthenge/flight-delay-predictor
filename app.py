@@ -48,14 +48,20 @@ Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode
 To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that is instantly accessible.
 """, unsafe_allow_html=True)
 
-# --- Modeling Summary ---
-st.markdown("## 📊 Modeling Summary")
+st.markdown("### 🔍 Model Info")
 st.markdown("""
-- **Algorithms Used:** Random Forest, XGBoost  
-- **Evaluation Metrics:** ROC-AUC, Precision, Recall, F1 Score  
+- **Model Used:** XGBoost (Gradient Boosted Trees)  
+- **Training Volume:** 10K+ flight records  
+- **Accuracy Achieved:** 87%  
 - **Tuning Method:** GridSearchCV  
-- **Prediction Output:** Probability of delay (0–100%)  
+- **Output:** Delay probability (0–100%)  
 """)
+
+st.markdown("""
+![Model: XGBoost](https://img.shields.io/badge/Model-XGBoost-orange?style=flat-square&logo=xgboost)
+![Evaluation: ROC-AUC](https://img.shields.io/badge/Evaluation-ROC--AUC-blue?style=flat-square&logo=scikit-learn)
+![Tuning: GridSearchCV](https://img.shields.io/badge/Tuning-GridSearchCV-lightgrey?style=flat-square&logo=python)
+""", unsafe_allow_html=True)
 
 # --- Load Model ---
 model = joblib.load("model/flight_delay_model.pkl")
