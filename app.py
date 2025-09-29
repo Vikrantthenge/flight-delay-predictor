@@ -1,10 +1,12 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import shap
 import plotly.express as px
 import qrcode
 from PIL import Image
+import shap
+import matplotlib.pyplot as plt
+
 
 # --- Page Setup ---
 st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
