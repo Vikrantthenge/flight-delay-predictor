@@ -4,4 +4,4 @@ joblib
 scikit-learn
 plotly
 qrcode
-
+shap
