@@ -202,6 +202,8 @@ fig_imp = px.bar(
 )
 st.plotly_chart(fig_imp, use_container_width=True)
 
+import io
+
 # --- SHAP Explainability ---
 st.subheader("🧠 SHAP Explainability")
 st.markdown("""
@@ -209,7 +211,6 @@ SHAP (SHapley Additive exPlanations) helps interpret how each feature contribute
 Below is a summary plot showing the most influential features for the current input.
 """)
 
-# Create a batch of sample inputs for SHAP
 sample_inputs = pd.concat([
     create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
     create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
@@ -219,11 +220,15 @@ sample_inputs = pd.concat([
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_inputs)
 
+# Save SHAP plot to buffer
 plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
-fig = plt.gcf()
-st.pyplot(fig)
-plt.clf()
+buf = io.BytesIO()
+plt.savefig(buf, format="png", bbox_inches="tight")
+plt.close()
+
+# Display in Streamlit
+st.image(buf)
 
 # Force SHAP to draw into a new figure
 plt.figure(figsize=(10, 6))
