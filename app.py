@@ -211,6 +211,7 @@ SHAP (SHapley Additive exPlanations) helps interpret how each feature contribute
 Below is a summary plot showing the most influential features for the current input.
 """)
 
+# Create a batch of sample inputs for SHAP
 sample_inputs = pd.concat([
     create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
     create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
@@ -219,6 +220,16 @@ sample_inputs = pd.concat([
 
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_inputs)
+
+# Create SHAP plot and save to buffer
+fig = plt.figure(figsize=(10, 6))
+shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
+buf = io.BytesIO()
+fig.savefig(buf, format="png", bbox_inches="tight")
+plt.close(fig)
+
+# Display in Streamlit
+st.image(buf)
 
 # Save SHAP plot to buffer
 plt.figure(figsize=(10, 6))
