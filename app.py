@@ -209,13 +209,17 @@ SHAP (SHapley Additive exPlanations) helps interpret how each feature contribute
 Below is a summary plot showing the most influential features for the current input.
 """)
 
+# Create input sample
 sample_input = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination)
 
+# SHAP explainer and values
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_input)
 
-shap.summary_plot(shap_values, sample_input, plot_type="bar")
-st.pyplot()
+# Create a Matplotlib figure and render SHAP plot into it
+fig, ax = plt.subplots()
+shap.summary_plot(shap_values, sample_input, plot_type="bar", show=False)
+st.pyplot(fig)
 
 # --- Footer ---
 st.markdown("---")
