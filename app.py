@@ -7,7 +7,6 @@ from PIL import Image
 
 # --- Page Setup ---
 st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
-
 custom_reds = ["#4A0000", "#800000", "#8B0000", "#B22222", "#DC143C"]
 
 # --- Header ---
@@ -24,14 +23,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("Predict flight delays based on route, airline, and weather conditions.")
-
-st.markdown("""
-<div style='background-color:#8B0000; padding:6px; text-align:center; border-radius:5px;'>
-    <span style='color:white; font-size:16px;'> Delay Forecasting Dashboard</span>
-</div>
-""", unsafe_allow_html=True)
-
 # --- Overview ---
 st.markdown("## 🧭 Overview")
 st.markdown("""
@@ -44,29 +35,27 @@ Built with Streamlit and optimized for recruiter-facing clarity and real-world i
 ### 🧠 Tech Stack  
 Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
 
-### 🎯 Purpose  
-To showcase predictive modeling, dashboarding, and aviation domain expertise in a visually compelling format that is instantly accessible.
+### 📈 Delay Summary  
+- Trained on 10K+ flight records  
+- Average delay probability across dataset: **32.7%**  
+- Model used: **XGBoost**, tuned via **GridSearchCV**  
+- Evaluation metrics: ROC-AUC, Precision, Recall, F1 Score  
 """, unsafe_allow_html=True)
 
-st.markdown("### 🔍 Model Info")
+# --- Modeling Summary ---
+st.markdown("## 📊 Modeling Summary")
 st.markdown("""
-- **Model Used:** XGBoost (Gradient Boosted Trees)  
+- **Algorithms Used:** Random Forest, XGBoost  
 - **Training Volume:** 10K+ flight records  
-- **Accuracy Achieved:** 87%  
+- **Evaluation Metrics:** ROC-AUC, Precision, Recall, F1 Score  
 - **Tuning Method:** GridSearchCV  
-- **Output:** Delay probability (0–100%)  
+- **Prediction Output:** Delay probability (0–100%)  
 """)
-
-st.markdown("""
-![Model: XGBoost](https://img.shields.io/badge/Model-XGBoost-orange?style=flat-square&logo=xgboost)
-![Evaluation: ROC-AUC](https://img.shields.io/badge/Evaluation-ROC--AUC-blue?style=flat-square&logo=scikit-learn)
-![Tuning: GridSearchCV](https://img.shields.io/badge/Tuning-GridSearchCV-lightgrey?style=flat-square&logo=python)
-""", unsafe_allow_html=True)
 
 # --- Load Model ---
 model = joblib.load("model/flight_delay_model.pkl")
 
-# --- Function for Inputs ---
+# --- Input Function ---
 def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination):
     input_dict = {
         "Dep_Hour": dep_hour,
@@ -75,28 +64,23 @@ def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airlin
         "weather__hourly__humidity": humidity,
         "weather__hourly__cloudcover": cloudcover
     }
-
     for a in ["Air India", "Go Air", "Indigo", "Spicejet", "Vistara"]:
         input_dict[f"Airline_{a}"] = 1 if airline == a else 0
     for o in ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]:
         input_dict[f"From_{o}"] = 1 if origin == o else 0
     for d in ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]:
         input_dict[f"TO_{d}"] = 1 if destination == d else 0
-
     input_df = pd.DataFrame([input_dict])
-
     for col in model.feature_names_in_:
         if col not in input_df.columns:
             input_df[col] = 0
-
     input_df = input_df[model.feature_names_in_]
     return input_df
 
-# --- Sidebar Layout ---
+# --- Sidebar ---
 with st.sidebar:
     st.markdown("✈️ **Flight Delay Predictor** ✈️")
 
-    # QR Code + Thumbnail
     qr_url = "https://flight-delay-predictor-pulse.streamlit.app/"
     qr = qrcode.make(qr_url)
     qr_img = qr.resize((150, 150))
@@ -118,23 +102,23 @@ with st.sidebar:
 
     st.markdown("### 🔍 Model Info")
     st.markdown("""
-    - **Model:** XGBoost  
-    - **Accuracy:** 87%  
+    - **Model Used:** XGBoost (Gradient Boosted Trees)  
+    - **Accuracy Achieved:** 87%  
     - **Tuned with:** GridSearchCV  
+    - **Output:** Delay probability  
     """)
 
     st.header("Flight Details")
-    dep_hour = st.slider("Departure Hour", 0, 23, 9, key="dep_hour")
-    arr_hour = st.slider("Arrival Hour", 0, 23, 11, key="arr_hour")
-    visibility = st.slider("Visibility (km)", 1, 10, 5, key="visibility")
-    humidity = st.slider("Humidity (%)", 10, 100, 60, key="humidity")
-    cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40, key="cloudcover")
+    dep_hour = st.slider("Departure Hour", 0, 23, 9)
+    arr_hour = st.slider("Arrival Hour", 0, 23, 11)
+    visibility = st.slider("Visibility (km)", 1, 10, 5)
+    humidity = st.slider("Humidity (%)", 10, 100, 60)
+    cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40)
+    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"])
+    origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
+    destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
 
-    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"], key="airline")
-    origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"], key="origin")
-    destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"], key="destination")
-
-# --- Custom CSS for Centered Red Button ---
+# --- Custom Button Styling ---
 st.markdown("""
     <style>
     section[data-testid="stSidebar"] button[kind="secondary"] {
@@ -156,8 +140,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Prediction Button ---
-if st.sidebar.button("Predict Delay", key="predict_btn"):
+# --- Prediction ---
+if st.sidebar.button("Predict Delay"):
     input_df = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination)
     prediction = model.predict_proba(input_df)[0][1]
     st.metric(label="Predicted Delay Probability", value=f"{prediction*100:.1f}%")
@@ -194,9 +178,18 @@ fig_line = px.line(
 )
 st.plotly_chart(fig_line, use_container_width=True)
 
+# --- Feature Importance Placeholder ---
+st.subheader("📌 Feature Importance (Coming Soon)")
+st.markdown("""
+This section will visualize which features most influence delay predictions — such as departure hour, humidity, and airline.  
+SHAP or model-based importance charts will be added in the next update.
+""")
+
+
 # --- Footer ---
 st.markdown("---")
 st.markdown("Made with ❤️ by **Vikrant Thenge** |")
+st.caption("🕒 Last updated: September 2025")
 st.markdown("---")
 
 st.markdown("""
