@@ -217,7 +217,13 @@ sample_inputs = pd.concat([
 ])
 
 explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(sample_input)
+shap_values = explainer.shap_values(sample_inputs)
+
+plt.figure(figsize=(10, 6))
+shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
+fig = plt.gcf()
+st.pyplot(fig)
+plt.clf()
 
 # Force SHAP to draw into a new figure
 plt.figure(figsize=(10, 6))
