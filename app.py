@@ -183,28 +183,7 @@ st.plotly_chart(fig_line, use_container_width=True)
 st.subheader("📌 Feature Importance")
 st.markdown("""
 This chart highlights which features most influence delay predictions — such as departure hour, humidity, and airline.  
-Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability.
-""")
-
-importance_df = pd.DataFrame({
-    "Feature": model.feature_names_in_,
-    "Importance": model.feature_importances_
-}).sort_values(by="Importance", ascending=False)
-
-fig_imp = px.bar(
-    importance_df.head(10),
-    x="Feature",
-    y="Importance",
-    title="Top 10 Feature Importances",
-    color_discrete_sequence=[custom_reds[3]]
-)
-st.plotly_chart(fig_imp, use_container_width=True)
-
-# --- Feature Importance ---
-st.subheader("📌 Feature Importance")
-st.markdown("""
-This section will visualize which features most influence delay predictions — such as departure hour, humidity, and airline.  
-SHAP or model-based importance charts will be added in the next update.
+Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability..
 """)
 importance_df = pd.DataFrame({
     "Feature": model.feature_names_in_,
