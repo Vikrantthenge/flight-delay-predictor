@@ -204,6 +204,11 @@ st.plotly_chart(fig_imp, use_container_width=True)
 
 import io
 
+import shap
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
 # --- SHAP Explainability ---
 st.subheader("🧠 SHAP Explainability")
 st.markdown("""
@@ -221,16 +226,14 @@ sample_inputs = pd.concat([
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_inputs)
 
-# Create SHAP plot and save to buffer
-fig = plt.figure(figsize=(10, 6))
+# Save SHAP plot to file
+plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
-buf = io.BytesIO()
-fig.savefig(buf, format="png", bbox_inches="tight")
-plt.close(fig)
+plt.savefig("shap_plot.png", bbox_inches="tight")
+plt.close()
 
 # Display in Streamlit
-st.image(buf)
-
+st.image("shap_plot.png")
 # Save SHAP plot to buffer
 plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
