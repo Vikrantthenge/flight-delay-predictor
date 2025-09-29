@@ -238,6 +238,17 @@ plt.close()
 # Display in Streamlit
 st.image(buf)
 
+# Layman-friendly explanation
+with st.expander("🔍 What does this SHAP plot mean?"):
+    st.markdown("""
+    - 🟥 **Red bars** = Features that strongly push the model toward predicting a delay  
+    - 🟨 **Yellow bars** = Moderate influence on prediction  
+    - 🟩 **Green bars** = Features that reduce the likelihood of delay  
+    - 📊 Bar length = Strength of impact on prediction  
+    - 🧠 Helps recruiters and stakeholders understand why the model made its decision  
+    """)
+
+
 
 # --- Footer ---
 st.markdown("---")
