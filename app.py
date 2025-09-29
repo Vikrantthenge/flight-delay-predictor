@@ -209,7 +209,12 @@ SHAP (SHapley Additive exPlanations) helps interpret how each feature contribute
 Below is a summary plot showing the most influential features for the current input.
 """)
 
-sample_input = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination)
+# Create a batch of sample inputs for SHAP
+sample_inputs = pd.concat([
+    create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
+    create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
+    create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV")
+])
 
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_input)
