@@ -116,7 +116,7 @@ with st.sidebar:
     arr_hour = st.slider("Arrival Hour", 0, 23, 11)
     visibility = st.slider("Visibility (km)", 1, 10, 5)
     humidity = st.slider("Humidity (%)", 10, 100, 60)
-    cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40
+    cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40)
     airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"])                    
     origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
     destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
