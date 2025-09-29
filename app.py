@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import shap
 import plotly.express as px
 import qrcode
 from PIL import Image
@@ -199,6 +200,21 @@ fig_imp = px.bar(
 )
 st.plotly_chart(fig_imp, use_container_width=True)
 
+# --- SHAP Explainability ---
+st.subheader("🧠 SHAP Explainability")
+st.markdown("""
+SHAP (SHapley Additive exPlanations) helps interpret how each feature contributes to the model's prediction.  
+Below is a summary plot showing the most influential features for the current input.
+""")
+
+sample_input = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination)
+
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(sample_input)
+
+st.set_option('deprecation.showPyplotGlobalUse', False)
+shap.summary_plot(shap_values, sample_input, plot_type="bar", show=False)
+st.pyplot()
 
 # --- Footer ---
 st.markdown("---")
