@@ -154,7 +154,7 @@ if st.sidebar.button("Predict Delay"):
 st.subheader("📊 Average Delay by Airline")
 airline_delay_df = pd.DataFrame({
     "Airline": ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"],
-    "Avg Delay (min)": [12, 18, 22, 15, 9]
+    "Avg Delay (min)": [12, 18, 22, 15, 17, 9]  # Added Air Asia with sample delay value
 })
 fig_bar = px.bar(
     airline_delay_df,
