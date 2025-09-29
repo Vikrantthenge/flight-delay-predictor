@@ -157,20 +157,22 @@ airline_colors = {
     "Air India": "#FFA500",   # Orange
     "Akasa Air": "#FFD700",   # Yellow
     "Air Asia": "#1E90FF",    # Blue
-    "Vistara": "#A52A2A"      # Brownish red (fallback tone)
+    "Vistara": "#A52A2A"      # Brownish red
 }
+
 st.subheader("📊 Average Delay by Airline")
 airline_delay_df = pd.DataFrame({
     "Airline": ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"],
-    "Avg Delay (min)": [12, 18, 22, 15, 17, 9] 
+    "Avg Delay (min)": [12, 18, 22, 15, 17, 9]
 })
+
 fig_bar = px.bar(
     airline_delay_df,
     x="Airline",
     y="Avg Delay (min)",
     color="Airline",
     title="Average Delay by Airline",
-    color_discrete_sequence=custom_reds
+    color_discrete_map=airline_colors  # ✅ Use this instead of color_discrete_sequence
 )
 st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -179,6 +181,7 @@ hourly_delay_df = pd.DataFrame({
     "Hour": list(range(0, 24)),
     "Avg Delay (min)": [5, 6, 8, 10, 12, 15, 18, 20, 22, 19, 17, 14, 12, 10, 9, 8, 7, 6, 5, 4, 4, 5, 6, 7]
 })
+
 fig_line = px.line(
     hourly_delay_df,
     x="Hour",
@@ -186,7 +189,7 @@ fig_line = px.line(
     title="Delay Distribution by Departure Hour",
     markers=True,
     line_shape="spline",
-    color_discrete_sequence=[custom_reds[2]]
+    color_discrete_sequence=["#8B0000"]  # Optional: pick a single tone from your reds
 )
 st.plotly_chart(fig_line, use_container_width=True)
 
