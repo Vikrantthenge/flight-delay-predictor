@@ -168,7 +168,7 @@ fig_bar = px.bar(
     airline_delay_df,
     x="Airline",
     y="Avg Delay (min)",
-    color="Airline",
+    color="airline_colors",
     title="Average Delay by Airline",
     color_discrete_sequence=custom_reds
 )
