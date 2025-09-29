@@ -250,7 +250,7 @@ with st.expander("🔍 What does this SHAP plot mean?"):
     - 🟨 **Yellow bars** = Moderate influence on prediction  
     - 🟩 **Green bars** = Features that reduce the likelihood of delay  
     - 📊 Bar length = Strength of impact on prediction  
-    - 🧠 Helps recruiters and stakeholders understand why the model made its decision  
+    - 🧠 Helps stakeholders understand why the model made its decision  
     """)
 
 # --- Footer ---
