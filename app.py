@@ -178,15 +178,13 @@ fig_line = px.line(
 )
 st.plotly_chart(fig_line, use_container_width=True)
 
-# --- Feature Importance Placeholder ---
-st.subheader("📌 Feature Importance (Coming Soon)")
+
+# --- Feature Importance ---
+st.subheader("📌 Feature Importance")
 st.markdown("""
 This section will visualize which features most influence delay predictions — such as departure hour, humidity, and airline.  
 SHAP or model-based importance charts will be added in the next update.
 """)
-
-# --- Feature Importance ---
-st.subheader("📌 Feature Importance")
 importance_df = pd.DataFrame({
     "Feature": model.feature_names_in_,
     "Importance": model.feature_importances_
