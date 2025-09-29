@@ -214,12 +214,16 @@ sample_input = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudco
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_input)
 
-# Create SHAP plot and capture it using Matplotlib's global figure
+# Force SHAP to draw into a new figure
+plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, sample_input, plot_type="bar", show=False)
 
-# Now grab the current figure and pass it to Streamlit
+# Capture and display the figure
 fig = plt.gcf()
 st.pyplot(fig)
+
+# Optional: clear the figure to avoid overlap on rerun
+plt.clf()
 
 # --- Footer ---
 st.markdown("---")
