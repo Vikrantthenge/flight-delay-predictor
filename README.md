@@ -36,11 +36,12 @@
 
 ## 🚀 Live Demo
 
-[![View in Streamlit](https://img.shields.io/badge/Launch%20App-FlightPulse-darkred?logo=streamlit)](https://share.streamlit.io/vikrantthenge/flight-delay-predictor/main/app.py)
-📱 Scan QR code on resume or LinkedIn banner for instant access
-[![Flight Delay Predictor CI](https://github.com/Vikrantthenge/flight-delay-predictor/actions/workflows/flightdelay-ci.yml/badge.svg)](https://github.com/Vikrantthenge/flight-delay-predictor/actions/workflows/flightdelay-ci.yml)
+[![Launch App](https://img.shields.io/badge/Launch%20App-FlightPulse-darkred?logo=streamlit)](https://share.streamlit.io/vikrantthenge/flight-delay-predictor/main/app.py)
+![Model](https://img.shields.io/badge/Model-Random%20Forest-green)
+![Explainability](https://img.shields.io/badge/Explainability-SHAP-blue)
+![Deployment](https://img.shields.io/badge/Deployed%20On-Streamlit%20Cloud-purple)
+[![CI Status](https://github.com/Vikrantthenge/flight-delay-predictor/actions/workflows/flightdelay-ci.yml/badge.svg)](https://github.com/Vikrantthenge/flight-delay-predictor/actions/workflows/flightdelay-ci.yml)
 
----
 
 ## 🔄 CI/CD Integration
 
