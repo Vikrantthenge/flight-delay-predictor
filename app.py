@@ -6,7 +6,7 @@ import qrcode
 from PIL import Image
 import shap
 import matplotlib.pyplot as plt
-
+import io
 
 # --- Page Setup ---
 st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
@@ -67,7 +67,7 @@ def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airlin
         "weather__hourly__humidity": humidity,
         "weather__hourly__cloudcover": cloudcover
     }
-    for a in ["Air India", "Go Air", "Indigo", "Spicejet", "Vistara"]:
+    for a in ["Air India", "Akasa Air", "Indigo", "Spicejet", "Vistara"]:
         input_dict[f"Airline_{a}"] = 1 if airline == a else 0
     for o in ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]:
         input_dict[f"From_{o}"] = 1 if origin == o else 0
@@ -117,9 +117,10 @@ with st.sidebar:
     visibility = st.slider("Visibility (km)", 1, 10, 5)
     humidity = st.slider("Humidity (%)", 10, 100, 60)
     cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40)
-    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"])
+    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Akasa Air", "Vistara"])
     origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
     destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
+    st.caption("ℹ️ Note: 'Go Air' has been replaced with 'Akasa Air' for current relevance.")
 
 # --- Custom Button Styling ---
 st.markdown("""
@@ -152,7 +153,7 @@ if st.sidebar.button("Predict Delay"):
 # --- Charts ---
 st.subheader("📊 Average Delay by Airline")
 airline_delay_df = pd.DataFrame({
-    "Airline": ["Indigo", "Spicejet", "Air India", "Go Air", "Vistara"],
+    "Airline": ["Indigo", "Spicejet", "Air India", "Akasa Air", "Vistara"],
     "Avg Delay (min)": [12, 18, 22, 15, 9]
 })
 fig_bar = px.bar(
@@ -181,19 +182,16 @@ fig_line = px.line(
 )
 st.plotly_chart(fig_line, use_container_width=True)
 
-
 # --- Feature Importance ---
 st.subheader("📌 Feature Importance")
 st.markdown("""
 This chart highlights which features most influence delay predictions — such as departure hour, humidity, and airline.  
-Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability..
+Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability.
 """)
 importance_df = pd.DataFrame({
     "Feature": model.feature_names_in_,
     "Importance": model.feature_importances_
-}).sort_values(by="Importance", ascending=False)
-
-fig_imp = px.bar(
+    fig_imp = px.bar(
     importance_df.head(10),
     x="Feature",
     y="Importance",
@@ -201,12 +199,6 @@ fig_imp = px.bar(
     color_discrete_sequence=[custom_reds[3]]
 )
 st.plotly_chart(fig_imp, use_container_width=True)
-
-
-import shap
-import matplotlib.pyplot as plt
-import pandas as pd
-import io
 
 # --- SHAP Explainability ---
 st.subheader("🧠 SHAP Explainability")
@@ -220,7 +212,7 @@ sample_inputs = pd.concat([
     create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
     create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
     create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV"),
-    create_input_df(18, 20, 9, 85, 10, "Go Air", "HYD", "DEL"),
+    create_input_df(18, 20, 9, 85, 10, "Akasa Air", "HYD", "DEL"),
     create_input_df(22, 1, 2, 40, 90, "Vistara", "TRV", "MAA")
 ])
 
@@ -248,8 +240,6 @@ with st.expander("🔍 What does this SHAP plot mean?"):
     - 🧠 Helps recruiters and stakeholders understand why the model made its decision  
     """)
 
-
-
 # --- Footer ---
 st.markdown("---")
 st.markdown("Made with ❤️ by **Vikrant Thenge** |")
@@ -275,3 +265,4 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
