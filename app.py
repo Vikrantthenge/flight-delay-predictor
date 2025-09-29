@@ -212,8 +212,7 @@ sample_input = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudco
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(sample_input)
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
-shap.summary_plot(shap_values, sample_input, plot_type="bar", show=False)
+shap.summary_plot(shap_values, sample_input, plot_type="bar")
 st.pyplot()
 
 # --- Footer ---
