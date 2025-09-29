@@ -152,12 +152,12 @@ if st.sidebar.button("Predict Delay"):
 
 # --- Charts ---
 airline_colors = {
-    "Indigo": "#DC143C",      # Red
-    "Spicejet": "#800000",    # Maroon
-    "Air India": "#FFA500",   # Orange
-    "Akasa Air": "#FFD700",   # Yellow
-    "Air Asia": "#1E90FF",    # Blue
-    "Vistara": "#A52A2A"      # Brownish red
+    "Indigo": "#3F51B5",        # Indigo Blue
+    "Akasa Air": "#FFA500",     # Orange
+    "Air India": "#B22222",     # Red
+    "Vistara": "#4B2E2E",       # Dark Brown
+    "Spicejet": "#800000",      # Maroon
+    "Air Asia": "#A52A2A"       # Brownish Red
 }
 
 st.subheader("📊 Average Delay by Airline")
