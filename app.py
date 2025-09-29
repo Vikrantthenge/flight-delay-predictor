@@ -203,34 +203,38 @@ fig_imp = px.bar(
 st.plotly_chart(fig_imp, use_container_width=True)
 
 
-# --- SHAP Explainability ---
 import shap
 import matplotlib.pyplot as plt
 import pandas as pd
 import io
 
-# SHAP values
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(sample_inputs)
-
-# --- Method 1: Directly display SHAP in Streamlit ---
+# --- SHAP Explainability ---
 st.subheader("🧠 SHAP Explainability")
 st.markdown("""
 SHAP (SHapley Additive exPlanations) helps interpret how each feature contributes to the model's prediction.  
 Below is a summary plot showing the most influential features for the current input.
 """)
 
-# Save SHAP summary plot properly
-fig, ax = plt.subplots(figsize=(10, 6))
+# Create sample inputs
+sample_inputs = pd.concat([
+    create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
+    create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
+    create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV")
+])
+
+# Generate SHAP values
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(sample_inputs)
+
+# Save SHAP plot to buffer
+plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
-st.pyplot(fig)   # <-- use fig directly
-
-# Optional: Save to buffer
 buf = io.BytesIO()
-fig.savefig(buf, format="png", bbox_inches="tight")
-st.image(buf)
+plt.savefig(buf, format="png", bbox_inches="tight")
+plt.close()
 
-plt.close(fig)  # clean up
+# Display in Streamlit
+st.image(buf)
 
 
 # --- Footer ---
