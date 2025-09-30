@@ -122,6 +122,27 @@ with st.sidebar:
     destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
     st.caption("ℹ️ Note: 'Go Air' has been replaced with 'Akasa Air' for current relevance.")
 
+    import streamlit as st
+
+st.markdown("### 🔄 Jump to Another App")
+
+option = st.selectbox("Choose a project to launch:", [
+    "Crew Ops Dashboard",
+    "Flight Delay Predictor",
+    "Sentiment Analyzer",
+    "JobSearchMatch Bot"
+])
+
+if option == "Crew Ops Dashboard":
+    st.markdown("[Launch Crew Ops Dashboard](https://crew-optimizer.streamlit.app/)")
+elif option == "Flight Delay Predictor":
+    st.markdown("[Launch Flight Delay Predictor](https://flight-delay-predictor-pulse.streamlit.app/)")
+elif option == "Sentiment Analyzer":
+    st.markdown("[Launch Sentiment Analyzer](https://sentiment-analyzer-vikrant.streamlit.app/)")
+elif option == "JobSearchMatch Bot":
+    st.markdown("[Launch JobSearchMatch Bot](https://jobsearchmatch.streamlit.app/)")
+
+
 # --- Custom Button Styling ---
 st.markdown("""
     <style>
