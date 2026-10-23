@@ -1,281 +1,552 @@
-import streamlit as st
-import pandas as pd
+
+import io
+from pathlib import Path
+
 import joblib
+import matplotlib.pyplot as plt
+import pandas as pd
 import plotly.express as px
 import qrcode
-from PIL import Image
 import shap
-import matplotlib.pyplot as plt
-import io
+import streamlit as st
 
-# --- Page Setup ---
-st.set_page_config(page_title="Flight Delay Predictor", layout="wide")
-custom_reds = ["#4A0000", "#800000", "#8B0000", "#B22222", "#DC143C"]
 
-# --- Header ---
-st.markdown("""
-<div style='background-color:#8B0000; padding:6px; text-align:center; border-radius:5px;'>
-    <span style='color:white; font-size:16px;'> Flight Pulse </span>
-</div>
-""", unsafe_allow_html=True)
+# ============================================================
+# PAGE CONFIGURATION
+# ============================================================
 
-st.markdown("""
-<div style='text-align: center; padding: 10px 0;'>
-    <h1 style='color: darkred;'>✈️ Flight Pulse</h1>
-    <h3 style='color: gray;'>Delay Forecasting Dashboard</h3>
-</div>
-""", unsafe_allow_html=True)
+st.set_page_config(
+    page_title="Flight Pulse | Delay Risk Predictor",
+    page_icon="✈️",
+    layout="wide",
+)
 
-# --- Overview ---
-st.markdown("## 🧭 Overview")
-st.markdown("""
-**Flight Pulse** is a machine learning-powered dashboard that predicts flight delays based on airline, route, and weather conditions.  
-Trained on 10K+ flight records using Random Forest and XGBoost classifiers.  
-Includes ROC curve, precision-recall metrics, and hyperparameter tuning via GridSearchCV.  
-Visualizes delay distribution by airline and departure hour using Plotly charts.  
-Built with Streamlit and optimized for recruiter-facing clarity and real-world impact.
+CUSTOM_REDS = ["#4A0000", "#800000", "#8B0000", "#B22222", "#DC143C"]
+MODEL_PATH = Path(__file__).parent / "model" / "flight_delay_model.pkl"
 
-### 🧠 Tech Stack  
-Python, Pandas, Scikit-learn, Streamlit, Plotly, Joblib, Markdown + HTML, qrcode, PIL (Pillow)
+AIRLINE_FALLBACK = [
+    "Air India",
+    "Akasa Air",
+    "Indigo",
+    "Spicejet",
+    "Vistara",
+    "Air Asia",
+]
 
-### 📈 Delay Summary  
-- Trained on 10K+ flight records  
-- Average delay probability across dataset: **32.7%**  
-- Model used: **XGBoost**, tuned via **GridSearchCV**  
-- Evaluation metrics: ROC-AUC, Precision, Recall, F1 Score  
-""", unsafe_allow_html=True)
+AIRPORT_FALLBACK = ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]
 
-# --- Modeling Summary ---
-st.markdown("## 📊 Modeling Summary")
-st.markdown("""
-- **Algorithms Used:** Random Forest, XGBoost  
-- **Training Volume:** 10K+ flight records  
-- **Evaluation Metrics:** ROC-AUC, Precision, Recall, F1 Score  
-- **Tuning Method:** GridSearchCV  
-- **Prediction Output:** Delay probability (0–100%)  
-""")
 
-# --- Load Model ---
-model = joblib.load("model/flight_delay_model.pkl")
+# ============================================================
+# MODEL LOADING
+# ============================================================
 
-# --- Input Function ---
-def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination):
+@st.cache_resource
+def load_model(model_path):
+    return joblib.load(model_path)
+
+
+st.markdown(
+    """
+    <div style="background:#8B0000;padding:8px;text-align:center;
+                border-radius:5px;color:white;">
+        FLIGHT PULSE
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div style="text-align:center;padding:12px 0;">
+        <h1 style="color:darkred;">✈️ Flight Pulse</h1>
+        <h3 style="color:gray;">Flight Delay Risk Prediction Dashboard</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+if not MODEL_PATH.exists():
+    st.error(
+        f"Model file not found: {MODEL_PATH}. "
+        "Ensure model/flight_delay_model.pkl exists in your repository."
+    )
+    st.stop()
+
+try:
+    model = load_model(str(MODEL_PATH))
+except Exception as exc:
+    st.error(f"Unable to load the saved model: {exc}")
+    st.stop()
+
+
+# ============================================================
+# MODEL FEATURE DEFINITIONS
+# ============================================================
+
+MODEL_FEATURES = list(
+    getattr(
+        model,
+        "feature_names_in_",
+        [
+            "Dep_Hour",
+            "Arr_Hour",
+            "weather__hourly__visibility",
+            "weather__hourly__humidity",
+            "weather__hourly__cloudcover",
+        ],
+    )
+)
+
+
+def categories_from_features(prefix, fallback):
+    """Use categories represented in the saved model where possible."""
+    found = [
+        name[len(prefix):]
+        for name in MODEL_FEATURES
+        if name.startswith(prefix)
+    ]
+    return found if found else fallback
+
+
+AIRLINES = categories_from_features("Airline_", AIRLINE_FALLBACK)
+ORIGINS = categories_from_features("From_", AIRPORT_FALLBACK)
+DESTINATIONS = categories_from_features("TO_", AIRPORT_FALLBACK)
+
+
+def create_input_df(
+    dep_hour,
+    arr_hour,
+    visibility,
+    humidity,
+    cloudcover,
+    airline,
+    origin,
+    destination,
+):
+    """Create an input row using the saved model's feature order."""
+
     input_dict = {
         "Dep_Hour": dep_hour,
         "Arr_Hour": arr_hour,
         "weather__hourly__visibility": visibility,
         "weather__hourly__humidity": humidity,
-        "weather__hourly__cloudcover": cloudcover
+        "weather__hourly__cloudcover": cloudcover,
     }
-    for a in ["Air India", "Akasa Air", "Indigo", "Spicejet", "Vistara"]:
-        input_dict[f"Airline_{a}"] = 1 if airline == a else 0
-    for o in ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]:
-        input_dict[f"From_{o}"] = 1 if origin == o else 0
-    for d in ["BOM", "CCU", "DEL", "HYD", "MAA", "TRV"]:
-        input_dict[f"TO_{d}"] = 1 if destination == d else 0
-    input_df = pd.DataFrame([input_dict])
-    for col in model.feature_names_in_:
-        if col not in input_df.columns:
-            input_df[col] = 0
-    input_df = input_df[model.feature_names_in_]
-    return input_df
 
-# --- Sidebar ---
+    for name in MODEL_FEATURES:
+        if name.startswith("Airline_"):
+            category = name[len("Airline_"):]
+            input_dict[name] = int(airline == category)
+
+        elif name.startswith("From_"):
+            category = name[len("From_"):]
+            input_dict[name] = int(origin == category)
+
+        elif name.startswith("TO_"):
+            category = name[len("TO_"):]
+            input_dict[name] = int(destination == category)
+
+    # Missing model features are filled with zero, as in the
+    # original application. Confirm this matches training preprocessing.
+    input_df = pd.DataFrame([input_dict])
+
+    for column in MODEL_FEATURES:
+        if column not in input_df.columns:
+            input_df[column] = 0
+
+    return input_df[MODEL_FEATURES]
+
+
+def get_model_name(estimator):
+    """Identify the loaded estimator rather than guessing its algorithm."""
+    name = type(estimator).__name__
+
+    if name == "RandomForestClassifier":
+        trees = getattr(estimator, "n_estimators", None)
+        return f"Random Forest ({trees} trees)" if trees else name
+
+    return name
+
+
+def get_positive_class_probability(estimator, input_df):
+    """Return the probability for the delayed-flight class."""
+    if not hasattr(estimator, "predict_proba"):
+        raise ValueError(
+            "The loaded model does not support predict_proba()."
+        )
+
+    probabilities = estimator.predict_proba(input_df)[0]
+    classes = list(getattr(estimator, "classes_", []))
+
+    if 1 in classes:
+        positive_index = classes.index(1)
+    elif True in classes:
+        positive_index = classes.index(True)
+    else:
+        raise ValueError(
+            "Could not identify class 1 as the delayed-flight class. "
+            "Check the target labels used during model training."
+        )
+
+    return float(probabilities[positive_index])
+
+
+# ============================================================
+# OVERVIEW
+# ============================================================
+
+st.markdown("## 🧭 Project Overview")
+
+st.markdown(
+    """
+    Flight Pulse is an interactive application for exploring flight
+    delay risk using schedule, airline, route, and weather inputs.
+
+    The application loads a previously trained machine learning model
+    and provides prediction probabilities, model feature importance
+    where supported, and SHAP-based explanations.
+
+    **Scope:** This is a demonstration application. It does not connect
+    to live flight schedules, airline operations systems, or live weather
+    feeds.
+    """
+)
+
+with st.expander("📘 Model and evaluation information"):
+    st.markdown(
+        f"""
+        - **Loaded estimator:** `{get_model_name(model)}`
+        - **Prediction output:** Model-estimated class probability
+        - **Reported test accuracy:** Approximately 72%, pending
+          verification against the training and evaluation script
+        - **Reported baseline:** 67.5%, pending verification
+        - **Explainability:** SHAP, where supported by the estimator
+        """
+    )
+    st.caption(
+        "The accuracy and baseline above are reported figures, not "
+        "metrics recalculated by this application."
+    )
+
+
+# ============================================================
+# SIDEBAR AND INPUTS
+# ============================================================
+
 with st.sidebar:
-    st.markdown("✈️ **Flight Delay Predictor** ✈️")
+    st.markdown("✈️ **Flight Pulse**")
 
     qr_url = "https://flight-delay-predictor-pulse.streamlit.app/"
-    qr = qrcode.make(qr_url)
-    qr_img = qr.resize((150, 150))
 
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        st.image(qr_img, caption="Scan to Launch", width=100)
-    with col2:
-        st.markdown(
-            f"""
-            <a href="{qr_url}" target="_blank">
-                <img src="https://raw.githubusercontent.com/Vikrantthenge/flight-delay-predictor/main/thumbnail1.png" 
-                     alt="Flight Pulse Delay Forecasting" width="100" style="border-radius:6px;">
-            </a>
-            """,
-            unsafe_allow_html=True
-        )
-        st.caption("Click to Launch")
+    try:
+        qr_image = qrcode.make(qr_url)
+        st.image(qr_image, caption="Scan to open Flight Pulse", width=140)
+    except Exception:
+        st.markdown(f"[Open Flight Pulse]({qr_url})")
 
-    st.markdown("### 🔍 Model Info")
-    st.markdown("""
-    - **Model Used:** XGBoost (Gradient Boosted Trees)  
-    - **Accuracy Achieved:** 87%  
-    - **Tuned with:** GridSearchCV  
-    - **Output:** Delay probability  
-    """)
+    st.markdown("### 🔍 Model Information")
+    st.write(f"**Loaded model:** {get_model_name(model)}")
+    st.write("**Data source:** Historical model inputs")
+    st.write("**Mode:** Interactive demonstration")
 
+    st.divider()
     st.header("Flight Details")
-    dep_hour = st.slider("Departure Hour", 0, 23, 9)
-    arr_hour = st.slider("Arrival Hour", 0, 23, 11)
+
+    dep_hour = st.slider("Scheduled Departure Hour", 0, 23, 9)
+    arr_hour = st.slider("Scheduled Arrival Hour", 0, 23, 11)
+
     visibility = st.slider("Visibility (km)", 1, 10, 5)
     humidity = st.slider("Humidity (%)", 10, 100, 60)
     cloudcover = st.slider("Cloud Cover (%)", 0, 100, 40)
-    airline = st.selectbox("Airline", ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"])                    
-    origin = st.selectbox("From", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
-    destination = st.selectbox("To", ["DEL", "BOM", "HYD", "MAA", "TRV", "CCU"])
-    st.caption("ℹ️ Note: 'Go Air' has been replaced with 'Akasa Air' for current relevance.")
+
+    airline = st.selectbox("Airline", AIRLINES)
+    origin = st.selectbox("Origin Airport", ORIGINS)
+    destination = st.selectbox("Destination Airport", DESTINATIONS)
+
+    predict_clicked = st.button(
+        "Predict Delay Risk",
+        type="primary",
+        use_container_width=True,
+    )
 
 
-# --- Custom Button Styling ---
-st.markdown("""
-    <style>
-    section[data-testid="stSidebar"] button[kind="secondary"] {
-        background-color: #d62728 !important;
-        color: white !important;
-        font-weight: bold !important;
-        font-size: 16px !important;
-        border-radius: 6px !important;
-        padding: 0.6em 2em !important;
-        width: auto !important;
-        margin: auto !important;
-        display: block !important;
-        white-space: nowrap !important;
-    }
-    section[data-testid="stSidebar"] button[kind="secondary"]:hover {
-        background-color: #b22222 !important;
-        color: white !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ============================================================
+# PREDICTION
+# ============================================================
 
-# --- Prediction ---
-if st.sidebar.button("Predict Delay"):
-    input_df = create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airline, origin, destination)
-    prediction = model.predict_proba(input_df)[0][1]
-    st.metric(label="Predicted Delay Probability", value=f"{prediction*100:.1f}%")
+st.markdown("## ✈️ Delay Risk Assessment")
 
-# --- Charts ---
+if predict_clicked:
+    try:
+        input_df = create_input_df(
+            dep_hour,
+            arr_hour,
+            visibility,
+            humidity,
+            cloudcover,
+            airline,
+            origin,
+            destination,
+        )
+
+        prediction = get_positive_class_probability(model, input_df)
+
+        st.metric(
+            label="Model-Estimated Delay Probability",
+            value=f"{prediction * 100:.1f}%",
+        )
+
+        st.caption(
+            "This is the model's estimated probability for the selected "
+            "inputs. It is not a guaranteed outcome or a live flight forecast."
+        )
+
+        with st.expander("Inspect model inputs"):
+            st.dataframe(input_df, use_container_width=True)
+
+    except Exception as exc:
+        st.error(f"Prediction could not be generated: {exc}")
+else:
+    st.info(
+        "Choose the flight and weather inputs in the sidebar, "
+        "then select **Predict Delay Risk**."
+    )
+
+
+# ============================================================
+# ILLUSTRATIVE CHARTS
+# ============================================================
+
+st.markdown("---")
+st.markdown("## 📊 Illustrative Operations Charts")
+
+st.warning(
+    "The following charts use fixed example values from the original "
+    "application. They are illustrative only and are not calculated "
+    "from the training dataset or live airline operations data."
+)
+
 airline_colors = {
-    "Indigo": "#3F51B5",        # Indigo Blue
-    "Akasa Air": "#FFA500",     # Orange
-    "Air India": "#B22222",     # Red
-    "Vistara": "#4B2E2E",       # Dark Brown
-    "Spicejet": "#800000",      # Maroon
-    "Air Asia": "#A52A2A"       # Brownish Red
+    "Indigo": "#3F51B5",
+    "Akasa Air": "#FFA500",
+    "Air India": "#B22222",
+    "Vistara": "#4B2E2E",
+    "Spicejet": "#800000",
+    "Air Asia": "#A52A2A",
 }
 
-st.subheader("📊 Average Delay by Airline")
-airline_delay_df = pd.DataFrame({
-    "Airline": ["Indigo", "Spicejet", "Air India", "Akasa Air", "Air Asia", "Vistara"],
-    "Avg Delay (min)": [12, 18, 22, 15, 17, 9]
-})
+airline_delay_df = pd.DataFrame(
+    {
+        "Airline": [
+            "Indigo",
+            "Spicejet",
+            "Air India",
+            "Akasa Air",
+            "Air Asia",
+            "Vistara",
+        ],
+        "Avg Delay (min)": [12, 18, 22, 15, 17, 9],
+    }
+)
+
+st.subheader("Average Delay by Airline: Example Values")
 
 fig_bar = px.bar(
     airline_delay_df,
     x="Airline",
     y="Avg Delay (min)",
     color="Airline",
-    title="Average Delay by Airline",
-    color_discrete_map=airline_colors  # ✅ Use this instead of color_discrete_sequence
+    color_discrete_map=airline_colors,
+    title="Illustrative Average Delay by Airline",
+    labels={"Avg Delay (min)": "Example delay (minutes)"},
 )
+
 st.plotly_chart(fig_bar, use_container_width=True)
 
-st.subheader("⏱️ Delay Distribution by Departure Hour")
-hourly_delay_df = pd.DataFrame({
-    "Hour": list(range(0, 24)),
-    "Avg Delay (min)": [5, 6, 8, 10, 12, 15, 18, 20, 22, 19, 17, 14, 12, 10, 9, 8, 7, 6, 5, 4, 4, 5, 6, 7]
-})
+
+hourly_delay_df = pd.DataFrame(
+    {
+        "Hour": list(range(24)),
+        "Avg Delay (min)": [
+            5, 6, 8, 10, 12, 15, 18, 20,
+            22, 19, 17, 14, 12, 10, 9, 8,
+            7, 6, 5, 4, 4, 5, 6, 7,
+        ],
+    }
+)
+
+st.subheader("Delay by Departure Hour: Example Values")
 
 fig_line = px.line(
     hourly_delay_df,
     x="Hour",
     y="Avg Delay (min)",
-    title="Delay Distribution by Departure Hour",
     markers=True,
-    line_shape="spline",
-    color_discrete_sequence=["#8B0000"]  # Optional: pick a single tone from your reds
+    title="Illustrative Delay Pattern by Departure Hour",
+    labels={
+        "Hour": "Departure hour",
+        "Avg Delay (min)": "Example delay (minutes)",
+    },
 )
+
 st.plotly_chart(fig_line, use_container_width=True)
 
-# --- Feature Importance ---
-st.subheader("📌 Feature Importance")
-st.markdown("""
-This chart highlights which features most influence delay predictions — such as departure hour, humidity, and airline.  
-Based on model-derived importance scores from XGBoost, it surfaces the top 10 contributors to delay probability.
-""")
-importance_df = pd.DataFrame({
-    "Feature": model.feature_names_in_,
-    "Importance": model.feature_importances_
-})
- 
-fig_imp = px.bar(
-    importance_df.head(10),
-    x="Feature",
-    y="Importance",
-    title="Top 10 Feature Importances",
-    color_discrete_sequence=[custom_reds[3]]
+
+# ============================================================
+# FEATURE IMPORTANCE
+# ============================================================
+
+st.markdown("---")
+st.markdown("## 📌 Model Feature Importance")
+
+if hasattr(model, "feature_importances_"):
+    importance_df = pd.DataFrame(
+        {
+            "Feature": MODEL_FEATURES,
+            "Importance": model.feature_importances_,
+        }
+    ).sort_values("Importance", ascending=False)
+
+    fig_importance = px.bar(
+        importance_df.head(10).sort_values("Importance"),
+        x="Importance",
+        y="Feature",
+        orientation="h",
+        title="Top Model Feature Importances",
+        color_discrete_sequence=[CUSTOM_REDS[3]],
+    )
+
+    st.plotly_chart(fig_importance, use_container_width=True)
+
+    st.caption(
+        "Feature importance measures model reliance under the estimator's "
+        "importance definition. It does not establish causation."
+    )
+else:
+    st.info(
+        "The loaded estimator does not expose feature_importances_. "
+        "Use an explanation method appropriate for this model."
+    )
+
+
+# ============================================================
+# SHAP EXPLAINABILITY
+# ============================================================
+
+st.markdown("---")
+st.markdown("## 🧠 SHAP Explainability")
+
+st.markdown(
+    """
+    SHAP estimates how input features contribute to model predictions.
+    The summary below uses a small set of example scenarios. It is not
+    an explanation of the current prediction and should not be interpreted
+    as proof that a feature causes flight delays.
+    """
 )
-st.plotly_chart(fig_imp, use_container_width=True)
 
-# --- SHAP Explainability ---
-st.subheader("🧠 SHAP Explainability")
-st.markdown("""
-SHAP (SHapley Additive exPlanations) helps interpret how each feature contributes to the model's prediction.  
-Below is a summary plot showing the most influential features for the current input.
-""")
+try:
+    sample_inputs = pd.concat(
+        [
+            create_input_df(
+                9, 11, 5, 60, 40, AIRLINES[0],
+                ORIGINS[0], DESTINATIONS[0],
+            ),
+            create_input_df(
+                14, 16, 8, 70, 20, AIRLINES[0],
+                ORIGINS[0], DESTINATIONS[0],
+            ),
+            create_input_df(
+                6, 8, 3, 50, 60, AIRLINES[0],
+                ORIGINS[0], DESTINATIONS[0],
+            ),
+            create_input_df(
+                18, 20, 9, 85, 10, AIRLINES[0],
+                ORIGINS[0], DESTINATIONS[0],
+            ),
+            create_input_df(
+                22, 1, 2, 40, 90, AIRLINES[0],
+                ORIGINS[0], DESTINATIONS[0],
+            ),
+        ],
+        ignore_index=True,
+    )
 
-# Create sample inputs
-sample_inputs = pd.concat([
-    create_input_df(9, 11, 5, 60, 40, "Indigo", "DEL", "BOM"),
-    create_input_df(14, 16, 8, 70, 20, "Spicejet", "MAA", "HYD"),
-    create_input_df(6, 8, 3, 50, 60, "Air India", "CCU", "TRV"),
-    create_input_df(18, 20, 9, 85, 10, "Akasa Air", "HYD", "DEL"),
-    create_input_df(22, 1, 2, 40, 90, "Vistara", "TRV", "MAA")
-])
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(sample_inputs)
 
-# Generate SHAP values
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(sample_inputs)
+    # Handle common SHAP output formats for binary classifiers.
+    if isinstance(shap_values, list):
+        if len(shap_values) > 1:
+            plot_values = shap_values[1]
+        else:
+            plot_values = shap_values[0]
+    else:
+        plot_values = shap_values
 
-# Save SHAP plot to buffer
-plt.figure(figsize=(10, 6))
-shap.summary_plot(shap_values, sample_inputs, plot_type="bar", show=False)
-buf = io.BytesIO()
-plt.savefig(buf, format="png", bbox_inches="tight")
-plt.close()
+        if getattr(plot_values, "ndim", 0) == 3:
+            # Common shape: samples x features x classes.
+            plot_values = plot_values[:, :, -1]
 
-# Display in Streamlit
-st.image(buf)
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-# Layman-friendly explanation
-with st.expander("🔍 What does this SHAP plot mean?"):
-    st.markdown("""
-    - 🟥 **Red bars** = Features that strongly push the model toward predicting a delay  
-    - 🟨 **Yellow bars** = Moderate influence on prediction  
-    - 🟩 **Green bars** = Features that reduce the likelihood of delay  
-    - 📊 Bar length = Strength of impact on prediction  
-    - 🧠 Helps stakeholders understand why the model made its decision  
-    """)
+    shap.summary_plot(
+        plot_values,
+        sample_inputs,
+        plot_type="bar",
+        show=False,
+        max_display=10,
+    )
 
-# --- Footer ---
+    fig = plt.gcf()
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="png", bbox_inches="tight", dpi=150)
+    buffer.seek(0)
+    plt.close(fig)
+
+    st.image(buffer, caption="SHAP importance across example scenarios")
+
+    with st.expander("How to interpret this chart"):
+        st.markdown(
+            """
+            - Longer bars indicate greater average absolute SHAP impact
+              across the supplied example scenarios.
+            - This bar chart shows impact magnitude, not whether a feature
+              increases or decreases delay risk.
+            - It uses only five example rows, so the ranking may be unstable.
+            - SHAP explains the model's behavior, not the true causes of delays.
+            """
+        )
+
+except Exception as exc:
+    st.warning(
+        "SHAP could not generate the explanation for this model. "
+        f"Technical detail: {exc}"
+    )
+
+
+# ============================================================
+# FOOTER
+# ============================================================
+
 st.markdown("---")
-st.markdown("Made with ❤️ by **Vikrant Thenge** |")
-st.caption("🕒 Last updated: September 2025")
-st.markdown("---")
 
-st.markdown("""
-<div style='text-align: center; font-size: 16px;'>
-    <p><strong style='color: darkred;'>Crafted with precision. Powered by data. Designed for impact.</strong></p>
-    <p>
-        <a href='https://github.com/vikrantthenge' target='_blank'>
-            <img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='20' style='vertical-align:middle;' />
-            <span style='margin-left:8px;'>GitHub</span>
-        </a> &nbsp;&nbsp;&nbsp;
-        <a href='https://linkedin.com/in/vthenge' target='_blank'>
-            <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' width='20' style='vertical-align:middle;' />
-            <span style='margin-left:8px;'>LinkedIn</span>
-        </a> &nbsp;&nbsp;&nbsp;
-        <a href='mailto:vikrantthenge@outlook.com'>
-            <img src='https://cdn-icons-png.flaticon.com/512/732/732223.png' width='20' style='vertical-align:middle;' />
-            <span style='margin-left:8px;'>Outlook</span>
-        </a>
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <p><strong style="color:darkred;">
+            Flight Pulse | Flight Delay Risk Demonstration
+        </strong></p>
+        <p>
+            <a href="https://github.com/vikrantthenge" target="_blank">
+                GitHub
+            </a>
+            &nbsp; | &nbsp;
+            <a href="https://linkedin.com/in/vthenge" target="_blank">
+                LinkedIn
+            </a>
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
