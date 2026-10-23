@@ -83,7 +83,7 @@ def create_input_df(dep_hour, arr_hour, visibility, humidity, cloudcover, airlin
             category = col[len("From_"):]
             input_dict[col] = int(origin == category)
         elif col.startswith("To_"):
-            category = col[len("TO_"):]
+            category = col[len("To_"):]
             input_dict[col] = int(destination == category)
 
     input_df = pd.DataFrame([input_dict])
