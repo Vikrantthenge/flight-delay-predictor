@@ -215,10 +215,24 @@ st.markdown("""
 
 # --- Prediction ---
 if st.sidebar.button("Predict Delay"):
+    if origin == destination:
+        st.error(
+            "Origin and destination cannot be the same. "
+            "Please select a different destination."
+        )
+        st.stop()
+
     input_df = create_input_df(
-        dep_hour, arr_hour, visibility, humidity, cloudcover,
-        airline, origin, destination,
+        dep_hour,
+        arr_hour,
+        visibility,
+        humidity,
+        cloudcover,
+        airline,
+        origin,
+        destination,
     )
+    
     delay_score = float(model.predict_proba(input_df)[0][delayed_index])
     st.metric(label="Predicted Delay Risk", value=f"{delay_score * 100:.1f}%")
     st.caption(
