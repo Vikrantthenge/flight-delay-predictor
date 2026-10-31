@@ -45,10 +45,56 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
+
 # --- Evaluate ---
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    recall_score
+)
+
 y_pred = model.predict(X_test)
-print("✅ Accuracy:", accuracy_score(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+
+# Dataset size after dropping missing rows
+print("Records after cleaning:", len(df))
+print("Training records:", len(X_train))
+print("Test records:", len(X_test))
+
+# Target distribution
+print("\nTarget distribution (0 = not delayed, 1 = delayed):")
+print(df["Delay"].value_counts())
+print("\nTarget percentages:")
+print((df["Delay"].value_counts(normalize=True) * 100).round(2))
+
+# Model test accuracy
+test_accuracy = accuracy_score(y_test, y_pred)
+print(f"\nTest accuracy: {test_accuracy * 100:.2f}%")
+
+# Baseline: always predict the majority class in the training set
+majority_class = y_train.mode()[0]
+baseline_predictions = [majority_class] * len(y_test)
+baseline_accuracy = accuracy_score(y_test, baseline_predictions)
+
+print(f"Training majority class: {majority_class}")
+print(f"Majority-class baseline accuracy: {baseline_accuracy * 100:.2f}%")
+
+# Delayed-flight recall
+delay_recall = recall_score(y_test, y_pred, pos_label=1, zero_division=0)
+print(f"Delayed-flight recall: {delay_recall * 100:.2f}%")
+
+# Full evaluation
+print("\nClassification report:")
+print(classification_report(
+    y_test,
+    y_pred,
+    labels=[0, 1],
+    target_names=["Not delayed (15 min or less)", "Delayed (over 15 min)"],
+    zero_division=0
+))
+
+print("\nConfusion matrix:")
+print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
 import os
 os.makedirs("model", exist_ok=True)
