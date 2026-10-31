@@ -376,7 +376,7 @@ with st.expander("🔍 What does this SHAP plot mean?"):
 # --- Footer ---
 st.markdown("---")
 st.markdown("Made with ❤️ by **Vikrant Thenge** |")
-st.caption("🕒 Last updated: September 2025")
+st.caption("🕒 Last updated: October 2026")
 st.markdown("---")
 
 st.markdown("""
